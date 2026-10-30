@@ -383,6 +383,110 @@ tr:hover td{background:var(--bg-hover)}
 .fi-search-wrap{position:relative;display:block;width:260px}
 .fi-search-input{width:260px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px;outline:none}
 .fi-search-input:focus{border-color:var(--primary);box-shadow:0 0 0 2px rgba(59,130,246,.15)}
+
+/* ===============================================
+   🌐 移动端全面增强 — 补充 + 修正
+   =============================================== */
+
+/* --- 全局 touch 优化 --- */
+html{touch-action:manipulation}
+body{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%;text-size-adjust:100%;overscroll-behavior-y:contain}
+input,select,textarea{touch-action:manipulation}
+
+/* --- iOS 安全区域适配 --- */
+@supports(padding:max(0px)){
+  .topbar{padding-top:max(12px,env(safe-area-inset-top))}
+  .sidebar{padding-top:env(safe-area-inset-top)}
+}
+
+/* --- 移动端搜索框替代（顶栏隐藏搜索框后，在内容区显示） --- */
+@media(max-width:768px){
+  /* 表格内搜索框全宽 */
+  .table-filter-row{flex-wrap:wrap;gap:6px}
+  .table-filter-row>div{flex:1 1 100%}
+  /* 产品搜索框全宽 */
+  div[style*="max-width:260px"]{max-width:100% !important;width:100% !important}
+  /* 表格操作栏横滑 */
+  .table-actions{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;gap:6px;padding-bottom:4px}
+  .table-actions::-webkit-scrollbar{display:none}
+  /* 分类卡片网格从 200px 降到 140px */
+  .page-header+div[style*="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))"]{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+  /* stat-card 分类卡片移动端压缩 */
+  .stat-card{padding:12px !important}
+  .stat-card .stat-icon{width:28px;height:28px;font-size:13px;margin-bottom:6px}
+  .stat-card .stat-label{font-size:11px}
+  .stat-card .stat-value{font-size:18px}
+  .stat-card .stat-trend{font-size:10px;margin-top:4px}
+  /* 看板列卡片内边距 */
+  .kanban-col{padding:8px;margin:0 -6px}
+  .kanban-card{padding:10px;margin-bottom:8px}
+  /* 表格按钮 touch target 更大 */
+  table .btn-sm{min-width:32px;min-height:32px}
+  /* 弹窗图片预览 */
+  .img-preview-modal .modal-body{padding:0;background:#000;display:flex;align-items:center;justify-content:center}
+  .img-preview-modal img{max-width:100%;max-height:100vh;object-fit:contain}
+  /* 附件上传区 */
+  .upload-area{min-height:80px;display:flex;align-items:center;justify-content:center;padding:16px;border:2px dashed var(--border);border-radius:var(--radius);background:var(--bg)}
+  /* 产品列表表格操作列 */
+  table td:last-child{white-space:nowrap}
+  /* 详情弹窗图片 */
+  .detail-thumb{max-width:80px;max-height:80px}
+  /* 按钮组允许换行 */
+  .btn-group{flex-wrap:wrap}
+  /* Toast 移动端适配 */
+  .toast-container{top:env(safe-area-inset-top,8px);right:8px;left:8px}
+  /* 防止弹窗内容溢出 */
+  .modal-body{overflow-y:auto;-webkit-overflow-scrolling:touch}
+  /* 关闭按钮更大 */
+  .modal-close{width:40px;height:40px;font-size:22px;display:flex;align-items:center;justify-content:center}
+  /* 表格行点击区域增大 */
+  tbody tr{cursor:pointer}
+  /* 全局横向滚动容器 */
+  .table-wrap, .overflow-x-auto{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  /* 产品搜索和筛选栏 */
+  .products-toolbar{flex-direction:column;align-items:stretch;gap:8px}
+  /* 标签页切换 */
+  .tab-bar{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap}
+  .tab-bar::-webkit-scrollbar{display:none}
+  /* 文件上传 input */
+  input[type="file"]{font-size:12px;padding:6px}
+  /* 下拉选项更大 */
+  select option{padding:8px;font-size:14px}
+  /* 云同步面板 */
+  .cloud-sync-panel{padding:16px}
+  /* 表格内文本截断 */
+  td{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  td.wrap{max-width:none;white-space:normal}
+  /* 仪表盘 stat-card 紧凑 */
+  .stat-card{flex-direction:column;text-align:center}
+}
+
+/* --- 小屏手机进一步优化 --- */
+@media(max-width:480px){
+  /* 分类卡片 1 列 */
+  .page-header+div[style*="grid-template-columns:repeat(auto-fill,minmax(140px,1fr))"],
+  .page-header+div[style*="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))"]{grid-template-columns:repeat(2,1fr)}
+  /* 按钮文字简化 */
+  .btn-full-text{display:none}
+  .btn-icon-only{display:inline}
+  /* 表格完全卡片化（可选） */
+  table colgroup{display:none}
+  /* 弹窗底部按钮 2 列 */
+  .modal-footer .btn{flex:1 1 calc(50% - 4px);font-size:13px}
+}
+
+/* --- iPad 竖屏 --- */
+@media(min-width:769px) and (max-width:1024px){
+  .stat-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .form-grid{grid-template-columns:1fr 1fr}
+  .sidebar-overlay{display:none !important}
+}
+
+/* --- 打印隐藏 --- */
+@media print{
+  .sidebar,.topbar,.page-actions,.btn,.filter-bar,.view-bar,.cloud-sync-panel{display:none !important}
+  .main{margin:0 !important}
+}
 </style>
 <style id="__dm_no_drag_style__">* { -webkit-user-drag: none !important; }</style><style id="__dm_bindable_badge_style__">[data-sp-bindable="database"]{outline:1px dashed #0088ff;outline-offset:2px;border-radius:4px;}[data-sp-bindable="database"] *{pointer-events:none !important;transition:none !important;animation:none !important;}[data-sp-bindable="database"]{transition:none !important;animation:none !important;}</style></head>
 <body data-page-node-id="C4RitsImrOrMVycbebe8kQ" style="">
@@ -1893,6 +1997,73 @@ function dashChartClick(type){
     return;
   }
 }
+
+// ===============================================
+// 📱 移动端增强 JS
+// ===============================================
+(function(){
+  // 1. 侧边栏打开时锁定 body 滚动（通过监听 class 变化）
+  var sb=document.getElementById('sidebar');
+  var mo=document.getElementById('modalOverlay');
+  if(sb){
+    var obs=new MutationObserver(function(){
+      if(sb.classList.contains('mobile-open')){
+        document.body.style.overflow='hidden';
+      }else if(!mo || !mo.classList.contains('show')){
+        document.body.style.overflow='';
+      }
+    });
+    obs.observe(sb,{attributes:true,attributeFilter:['class']});
+  }
+  if(mo){
+    var obs2=new MutationObserver(function(){
+      if(mo.classList.contains('show')){
+        document.body.style.overflow='hidden';
+      }else if(!sb || !sb.classList.contains('mobile-open')){
+        document.body.style.overflow='';
+      }
+    });
+    obs2.observe(mo,{attributes:true,attributeFilter:['class']});
+  }
+
+  // 2. ESC 关闭弹窗/侧边栏
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){
+      if(mo && mo.classList.contains('show')){
+        window.closeModal && window.closeModal();
+      }
+      if(sb && sb.classList.contains('mobile-open')){
+        window.closeSidebarMobile && window.closeSidebarMobile();
+      }
+    }
+  });
+
+  // 3. 模态遮罩点击关闭
+  document.addEventListener('click',function(e){
+    if(e.target.id==='modalOverlay' || (e.target.classList && e.target.classList.contains('modal-overlay'))){
+      window.closeModal && window.closeModal();
+    }
+  });
+
+  // 4. iOS 检测 + 修复 active 状态
+  var isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent);
+  if(isIOS){
+    document.body.classList.add('ios');
+    document.addEventListener('touchstart',function(){},false);
+  }
+
+  // 5. 方向变化时重新渲染
+  window.addEventListener('orientationchange',function(){
+    setTimeout(function(){
+      window.renderPage && window.renderPage();
+    },300);
+  });
+
+  // 6. 防止 iOS 输入框放大
+  var style=document.createElement('style');
+  style.textContent='@media (max-width:768px){input,select,textarea{font-size:16px !important}}';
+  document.head.appendChild(style);
+})();
 
 // INIT
 var dbLoaded=loadDB();
