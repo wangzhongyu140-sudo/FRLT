@@ -812,7 +812,7 @@ function openSyncSettings(){
   var h='<div style="max-height:70vh;overflow-y:auto;padding:4px">';
   h+='<div style="font-size:13px;font-weight:600;margin-bottom:12px;color:#1e40af">☁ ① 数据云同步（Gist）</div>';
   h+='<div class="form-grid">';
-  h+='<div class="form-group full"><label>🔑 GitHub Personal Access Token <span style="color:#94a3b8">(gist 权限)</span></label><input type="password" id="gist_token" value="***REDACTED***'+esc(syncConfig.token)+'" placeholder="ghp_xxx..."><div style="font-size:11px;color:var(--text-muted);margin-top:4px">github.com → Settings → Developer settings → Personal access tokens，勾选 <code>gist</code></div></div>';
+  h+='<div class="form-group full"><label>🔑 GitHub Personal Access Token <span style="color:#94a3b8">(gist 权限)</span></label><input type="password" id="gist_token" value="'+esc(syncConfig.token)+'" placeholder="ghp_xxx..."><div style="font-size:11px;color:var(--text-muted);margin-top:4px">github.com → Settings → Developer settings → Personal access tokens，勾选 <code>gist</code></div></div>';
   h+='<div class="form-group"><label>Gist ID</label><input type="text" id="gist_id" value="'+esc(syncConfig.gistId)+'" placeholder="留空自动创建"></div>';
   h+='<div class="form-group"><label>自动同步</label><select id="gist_autoSync">'+selOpts(['开启','关闭'],syncConfig.autoSync?'开启':'关闭')+'</select></div>';
   h+='</div>';
@@ -823,7 +823,7 @@ function openSyncSettings(){
   h+='<div class="form-group full"><label>启用代码自动推送</label><select id="repo_enable">'+selOpts(['关闭（仅数据同步）','开启（数据+代码）'],syncConfig.enableRepoPush?'开启（数据+代码）':'关闭（仅数据同步）')+'</select></div>';
   h+='<div class="form-group"><label>仓库 Owner</label><input type="text" id="repo_owner" value="'+esc(syncConfig.repoOwner||'wangzhongyu140-sudo')+'"></div>';
   h+='<div class="form-group"><label>仓库名称</label><input type="text" id="repo_name" value="'+esc(syncConfig.repoName||'FRLT')+'"></div>';
-  h+='<div class="form-group full"><label>🔑 repo Token <span style="color:#ef4444">(需要勾选 <code>repo</code> 权限!)</span></label><input type="password" id="repo_token" value="***REDACTED***'+esc(syncConfig.repoToken||syncConfig.token)+'" placeholder="如果和上面同一个token可留空"><div style="font-size:11px;color:#64748b">⚠️ 这个 token 需要 <b>repo:contents</b> 写入权限，和 gist 权限是不同的 scope。建议单独创建。</div></div>';
+  h+='<div class="form-group full"><label>🔑 repo Token <span style="color:#ef4444">(需要勾选 <code>repo</code> 权限!)</span></label><input type="password" id="repo_token" value="'+esc(syncConfig.repoToken||syncConfig.token)+'" placeholder="如果和上面同一个token可留空"><div style="font-size:11px;color:#64748b">⚠️ 这个 token 需要 <b>repo:contents</b> 写入权限，和 gist 权限是不同的 scope。建议单独创建。</div></div>';
   h+='</div></div>';
   h+='<div style="margin-top:12px;font-size:11px;color:var(--text-muted);padding:8px;background:var(--bg);border-radius:var(--radius)">';
   h+='<b>使用步骤：</b><br>';
@@ -867,7 +867,12 @@ function saveSyncSettings(){
 async function gistApi(path,opts){
   var headers={'Authorization':'token '+syncConfig.token,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};
   if(opts&&opts.body)headers['Content-Type']='application/json';
-  var r=await fetch('https://api.github.com'+path,Object.assign({headers:headers},opts));
+  var url='https://api.github.com'+path;
+  // GET 请求加时间戳防浏览器缓存（GitHub Pages 静态托管环境特别容易缓存）
+  var isGet=!opts||!opts.method||opts.method.toUpperCase()==='GET';
+  if(isGet){url+=(url.includes('?')?'&':'?')+'_='+Date.now()}
+  var fetchOpts=Object.assign({headers:headers,cache:'no-cache'},opts||{});
+  var r=await fetch(url,fetchOpts);
   return r;
 }
 
@@ -968,7 +973,7 @@ function sanitizeSecrets(html){
   html=html.replace(/"(?:token|apiToken|api_key|apiKey|secret|password|auth)["']?\s*:\s*["'][^"']*["']/gi,'"$1":"***REDACTED***"');
   // 清除 localStorage 注入的配置对象里的 token 值
   html=html.replace(/("(?:gist_token|repo_token|sync_token|personal_access_token)["']?\s*:\s*)["'][^"']*["']/gi,'$1"***REDACTED***"');
-  // 清除 Authorization: ***REDACTED*** xxx 格式
+  // 清除 Authorization: token xxx 格式
   html=html.replace(/(Authorization\s*[:=]\s*["']?)([a-zA-Z0-9_\-]+)/gi,'$1***REDACTED***');
   // 清除典型 GitHub Token 前缀
   html=html.replace(/ghp_[a-zA-Z0-9]{20,}/g,'***REDACTED***');
